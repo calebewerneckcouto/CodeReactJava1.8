@@ -1,0 +1,281 @@
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 100%);
+}
+
+.login-form {
+  background: var(--bg-secondary);
+  padding: 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 400px;
+  animation: slideUp 0.5s ease;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-title {
+  color: var(--accent-primary);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 1rem;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-alert {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 4px solid var(--error);
+  color: var(--error);
+  text-align: center;
+}
+
+.login-debug {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.login-debug h4 {
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.25rem;
+  }
+
+  /* Adicione ao seu Login.css */
+
+/* Estado de loading do botão */
+.login-button.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Alertas com cores diferentes */
+.login-alert.error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+}
+
+.login-alert.info {
+  background-color: #eff;
+  border: 1px solid #cef;
+  color: #369;
+}
+
+/* Botão de credenciais de teste */
+.dev-tools {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.test-credentials-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.test-credentials-button:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.test-credentials-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Melhorias de acessibilidade nos inputs */
+.form-input:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .login-debug {
+    font-size: 12px;
+  }
+  
+  .test-credentials-button {
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+
+  /* Adicione ao Login.css */
+.dev-tools {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.test-button {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.test-button.secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+}
+
+.test-button:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.test-button.secondary:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.test-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-alert.error {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.login-alert.info {
+  background: #d1ecf1;
+  border: 1px solid #bee5eb;
+  color: #0c5460;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.button-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+}
+}

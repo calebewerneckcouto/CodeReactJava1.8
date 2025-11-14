@@ -1,0 +1,36 @@
+.profile-img {
+  border-radius: 50%;
+  border: 3px solid var(--accent-primary);
+  padding: 3px;
+  background: var(--bg-tertiary);
+  overflow: hidden;
+  transition: var(--transition);
+  margin: 0 auto;
+}
+
+.profile-img:hover {
+  transform: scale(1.05);
+  border-color: var(--accent-secondary);
+}
+
+.profile-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-img-small {
+  width: 60px;
+  height: 60px;
+}
+
+.profile-img-medium {
+  width: 100px;
+  height: 100px;
+}
+
+.profile-img-large {
+  width: 150px;
+  height: 150px;
+}
