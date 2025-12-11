@@ -4,12 +4,12 @@ import Login from './pages/Login';
 import Main from './pages/Main';
 import CreateCode from './pages/CreateCode';
 import { authService } from './services/authService';
-import './App.css'; // Importe o CSS aqui
+import './App.css';
 import './index.css';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/code/">  {/* 🔥 ADICIONE ESTA LINHA */}
       <div className="App">
         <Routes>
           <Route path="/" element={<Login />} />

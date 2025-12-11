@@ -1,7 +1,8 @@
 import { authService } from '../services/authService';
 
+// 🔥 CORREÇÃO: Aponte para o contexto correto da sua API Java
 const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://cwc3d.net' 
+  ? 'https://cwc3d.net/cwcdev'  // ✅ SEU CONTEXTO JAVA
   : 'http://localhost:8080';
 
 export const api = {
@@ -16,7 +17,8 @@ export const api = {
       console.error('❌ Token JWT inválido detectado!');
       console.error('Token:', token);
       authService.logout();
-      window.location.href = '/';
+      // 🔥 CORREÇÃO: Redirecionar para a URL correta do React
+      window.location.href = import.meta.env.PROD ? '/reactcode/' : '/';
       throw new Error('Token JWT inválido - por favor faça login novamente');
     }
 
@@ -24,7 +26,7 @@ export const api = {
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }), // ✅ Direto, não aninhado
+        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       },
       ...options,
@@ -51,7 +53,8 @@ export const api = {
       if (response.status === 401) {
         console.error('❌ 401 Unauthorized - Token inválido ou expirado');
         authService.logout();
-        window.location.href = '/';
+        // 🔥 CORREÇÃO: Redirecionar para a URL correta do React
+        window.location.href = import.meta.env.PROD ? '/reactcode/' : '/';
         return;
       }
 

@@ -24,6 +24,7 @@ const Main = () => {
   const [feedbackType, setFeedbackType] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,59 +32,53 @@ const Main = () => {
       navigate('/');
       return;
     }
-    fetchCodes();
-  }, [navigate, currentPage]);
+    loadCodes();
+  }, [navigate, currentPage, searchTerm]);
 
-  const fetchCodes = async (page = 0) => {
+  const loadCodes = async () => {
     setLoading(true);
     setError('');
+    
     try {
-      const data = await codeService.getCodes(page, 10); // Página atual, 10 itens por página
-      console.log('Codes received:', data);
+      let response;
       
-      // Spring Data Page retorna content (array) e totalPages
-      if (data && data.content) {
-        setCodes(data.content);
-        setTotalPages(data.totalPages || 0);
-      } else if (Array.isArray(data)) {
-        setCodes(data);
-        setTotalPages(0);
+      if (searchTerm.trim()) {
+        // Usa searchCodes (que faz chamada ao endpoint /search)
+        response = await codeService.searchCodes(searchTerm, currentPage, 10);
+      } else {
+        // Usa getCodes (que faz chamada ao endpoint raiz com paginação)
+        response = await codeService.getCodes(currentPage, 10);
+      }
+      
+      console.log('📊 Resposta da API:', response);
+      
+      // Spring Data Page retorna:
+      // content: Array de itens
+      // totalPages: Número total de páginas
+      // totalElements: Número total de elementos
+      // number: Página atual (0-based)
+      // size: Tamanho da página
+      // first: É a primeira página?
+      // last: É a última página?
+      
+      if (response && response.content) {
+        setCodes(response.content);
+        setTotalPages(response.totalPages || 0);
+        setTotalElements(response.totalElements || 0);
+        
+        // Verifica se a página atual é maior que o total de páginas
+        if (response.number !== undefined && response.number !== currentPage) {
+          console.log(`⚠️ Ajustando página: ${currentPage} → ${response.number}`);
+          setCurrentPage(response.number);
+        }
       } else {
         setCodes([]);
         setTotalPages(0);
+        setTotalElements(0);
       }
     } catch (error) {
-      console.error('Error fetching codes:', error);
-      setError('Erro ao carregar códigos: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchCodes = async (page = 0) => {
-    if (!searchTerm.trim()) {
-      fetchCodes(page);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const data = await codeService.searchCodes(searchTerm, page, 10);
-      
-      // Spring Data Page retorna content (array) e totalPages
-      if (data && data.content) {
-        setCodes(data.content);
-        setTotalPages(data.totalPages || 0);
-      } else if (Array.isArray(data)) {
-        setCodes(data);
-        setTotalPages(0);
-      } else {
-        setCodes([]);
-        setTotalPages(0);
-      }
-    } catch (error) {
-      console.error('Error searching codes:', error);
-      setError('Erro na busca: ' + error.message);
+      console.error('❌ Erro ao carregar códigos:', error);
+      setError('Erro ao carregar códigos: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }
@@ -92,13 +87,11 @@ const Main = () => {
   const handleSearchKeyPress = (e) => {
     if (e.key === 'Enter') {
       setCurrentPage(0);
-      searchCodes(0);
     }
   };
 
   const handleSearch = () => {
     setCurrentPage(0);
-    searchCodes(0);
   };
 
   const deleteCode = async (id) => {
@@ -109,11 +102,11 @@ const Main = () => {
       setFeedback('Código deletado com sucesso!');
       setFeedbackType('success');
       
-      // Recarrega a lista mantendo a página atual
-      if (searchTerm.trim()) {
-        searchCodes(currentPage);
+      // Se deletou o último item da página e não é a primeira página, volta uma
+      if (codes.length === 1 && currentPage > 0) {
+        setCurrentPage(currentPage - 1);
       } else {
-        fetchCodes(currentPage);
+        await loadCodes();
       }
       
       setTimeout(() => {
@@ -121,7 +114,7 @@ const Main = () => {
         setFeedbackType('');
       }, 3000);
     } catch (error) {
-      console.error('Error deleting code:', error);
+      console.error('❌ Erro ao deletar código:', error);
       setFeedback('Erro ao deletar código: ' + error.message);
       setFeedbackType('error');
       
@@ -140,19 +133,14 @@ const Main = () => {
       setFeedback('Código atualizado com sucesso!');
       setFeedbackType('success');
       
-      // Recarrega a lista mantendo a página atual
-      if (searchTerm.trim()) {
-        searchCodes(currentPage);
-      } else {
-        fetchCodes(currentPage);
-      }
+      await loadCodes();
       
       setTimeout(() => {
         setFeedback('');
         setFeedbackType('');
       }, 3000);
     } catch (error) {
-      console.error('Error updating code:', error);
+      console.error('❌ Erro ao atualizar código:', error);
       setFeedback('Erro ao atualizar código: ' + error.message);
       setFeedbackType('error');
     }
@@ -187,7 +175,6 @@ const Main = () => {
   const clearSearch = () => {
     setSearchTerm('');
     setCurrentPage(0);
-    fetchCodes(0);
   };
 
   const nextPage = () => {
@@ -200,6 +187,30 @@ const Main = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  const goToPage = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  // Gera array de números de página para exibição
+  const getPageNumbers = () => {
+    const pagesToShow = 5;
+    let startPage = Math.max(0, currentPage - Math.floor(pagesToShow / 2));
+    let endPage = startPage + pagesToShow - 1;
+    
+    if (endPage >= totalPages) {
+      endPage = totalPages - 1;
+      startPage = Math.max(0, endPage - pagesToShow + 1);
+    }
+    
+    const pages = [];
+    for (let i = startPage; i <= endPage && i < totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
   };
 
   if (loading) {
@@ -250,6 +261,15 @@ const Main = () => {
             <span>🔄</span>
             Limpar
           </button>
+        </div>
+        
+        {/* Informações da paginação */}
+        <div className="pagination-info">
+          {totalElements > 0 && (
+            <span className="total-info">
+              Total: {totalElements} código{totalElements !== 1 ? 's' : ''}
+            </span>
+          )}
         </div>
       </div>
 
@@ -375,6 +395,18 @@ const Main = () => {
             >
               ‹ Anterior
             </button>
+            
+            <div className="page-numbers">
+              {getPageNumbers().map(pageNum => (
+                <button
+                  key={pageNum}
+                  onClick={() => goToPage(pageNum)}
+                  className={`btn btn-sm ${currentPage === pageNum ? 'btn-primary' : 'btn-secondary'}`}
+                >
+                  {pageNum + 1}
+                </button>
+              ))}
+            </div>
             
             <span className="page-info">
               Página {currentPage + 1} de {totalPages}
